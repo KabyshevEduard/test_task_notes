@@ -1,0 +1,308 @@
+openapi: 3.0.4
+info:
+  title: Notes API
+  contact:
+    email: eduardkabyshev@vk.com
+  version: 1.0.12
+servers:
+  - url: localhost:5000/api
+tags:
+  - name: auth
+    description: Authentication in system
+    externalDocs:
+      description: Registration and getting jwt token
+      url: localhost:5000/api
+  - name: notes
+    description: Operations with notes
+paths:
+  /register/:
+    post:
+      tags:
+        - auth
+      summary: Registration.
+      description: Registration in api.
+      operationId: registartionUser
+      requestBody:
+        description: Add new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Passwords didnt match or login isnt unique
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - write:users
+  /getpair/:
+    post:
+      tags:
+        - auth
+      summary: Get token.
+      description: Get token.
+      operationId: gettingToken
+      requestBody:
+        description: Get token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: User doesnt exist
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - read:token
+    
+  /refresh_token/:  
+    post:
+      tags:
+        - auth
+      summary: Refresh token.
+      description: Refresh token.
+      operationId: refreshingToken
+      requestBody:
+        description: Refresh token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - read:token
+            
+  /create_note/:
+    post:
+      tags:
+        - notes
+      summary: Add new note.
+      description: Add new note.
+      operationId: create_note
+      requestBody:
+        description: Refresh token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Unauthorized
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - write:notes
+            
+  /get_notes/:
+    get:
+      tags:
+        - notes
+      summary: Get notes.
+      description: Get all users notes.
+      operationId: getNotes
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+        '401':
+          description: Unauthorized
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - read:pets
+            
+  /update_note/{note_id}/:
+    post:
+      tags:
+        - notes
+      summary: Update note by id.
+      description: Update a note by id.
+      operationId: updateNote
+      requestBody:
+        description: Update note
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+        required: true
+      parameters:
+        - name: note_id
+          in: path
+          description: Id of pet that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: There is no title or wrong id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - update:pets
+    
+  /delete_note/{note_id}/:        
+    post:
+      tags:
+        - notes
+      summary: Delete note by id.
+      description: Delete a note by id.
+      operationId: deleteNote
+      parameters:
+        - name: note_id
+          in: path
+          description: Id of pet that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Wrong id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        default:
+          description: Unexpected error
+      security:
+        - notes_auth:
+            - write:pets
+components:
+  schemas:
+    Note:
+      required:
+        - title
+      type: object
+      properties:
+        title:
+          type: string
+          format: string
+          example: "test"
+        discription:
+          type: string
+          format: string
+          example: "test"
+      xml:
+        name: category
+        
+    UserRegister:
+      required:
+        - login
+        - name
+        - password
+        - password2
+      type: object
+      properties:
+        login:
+          type: string
+          example: "theUser"
+        name:
+          type: string
+          example: "Oleg"
+        password:
+          type: string
+          example: "lalala123"
+        password2:
+          type: string
+          example: "lalala123"
+      xml:
+        name: user
+        
+    UserLogin:
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          type: string
+          example: "theUser"
+        password:
+          type: string
+          example: "lalala123"
+      xml:
+        name: user
+  
+    RefreshToken:
+      required:
+        - refresh
+      type: object
+      properties:
+        refresh:
+          type: string
+
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          format: string
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          format: message
+      
+              
+  securitySchemes:
+    notes_auth:
+      type: apiKey
+      name: jwt
+      in: header
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

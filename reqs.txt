@@ -1,0 +1,8 @@
+Django==5.2
+django-appconf==1.0.6
+django-user-accounts==3.3.2
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+requests==2.32.3
+python-dotenv
+psycopg2-binary
