@@ -16,18 +16,16 @@ services:
         networks:
             - default
             - backend_network
-        env_file:
-            - notes/notes/.env
         
     pg_db:
         image: postgres
         container_name: pg_db
         environment:
-            - POSTGRES_DB=Test_db
-            - POSTGRES_USER=e2rd
-            - POSTGRES_PASSWORD=lex2mubds
+            - POSTGRES_DB=${NAME}
+            - POSTGRES_USER=${USER}
+            - POSTGRES_PASSWORD=${PASSWORD}
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U e2rd -d Test_db"]
+            test: ["CMD-SHELL", "pg_isready -U ${USER} -d ${NAME}"]
             interval: 30s
             timeout: 10s
             retries: 5
@@ -35,8 +33,6 @@ services:
         networks:
             - default
             - backend_network
-        env_file:
-            - notes/notes/.env
     
 networks:
     backend_network:
