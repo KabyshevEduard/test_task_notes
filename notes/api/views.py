@@ -25,11 +25,11 @@ class CreationNoteView(APIView):
         title = request.data.get('title', None)
         discription = request.data.get('discription', None)
         if not title:
-            return Response({'status': 'Title is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'Title is incorrect'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
 
         note = Notes(title=title, discription=discription, user=request.user)
         note.save()
-        return Response({'status': 'success'})
+        return Response({'status': 'success'}, content_type='application/json')
 
 
 class GetNotesView(APIView):
@@ -49,21 +49,21 @@ class UpdateNoteView(APIView):
     def post(self, request, note_id):
         note = Notes.objects.get(pk=note_id)
         if note.user_id != request.user.pk:
-            return Response({'status': 'This note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'This note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         
         if not note:
-            return Response({'status': 'Note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'Note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         
         title = request.data.get('title', None)
         discription = request.data.get('discription', None)
 
         if not title:
-            return Response({'status': 'There is no title'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'There is no title'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         
         note.title = title
         note.discription = discription
         note.save()
-        return Response({'status': 'success'})
+        return Response({'status': 'success'}, content_type='application/json')
     
 
 class DeleteNoteView(APIView):
@@ -72,13 +72,13 @@ class DeleteNoteView(APIView):
     def post(self, request, note_id):
         note = Notes.objects.get(pk=note_id)
         if note.user_id != request.user.pk:
-            return Response({'status': 'This note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'This note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         
         if not note:
-            return Response({'status': 'Note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'Note doesnt exist'}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         
         note.delete()
-        return Response({'status': 'success'})
+        return Response({'status': 'success'}, content_type='application/json')
     
 
 
